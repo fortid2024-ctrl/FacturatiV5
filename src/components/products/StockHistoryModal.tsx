@@ -29,6 +29,17 @@ export default function StockHistoryModal({ isOpen, onClose, product }: StockHis
   const history = getProductStockHistory(product.id);
   const summary = getProductStockSummary(product.id);
 
+  // Calculer le vrai stock initial depuis l'historique
+  const calculateRealInitialStock = () => {
+    if (!summary) return product.initialStock || 0;
+    
+    // Le stock initial réel est le stock actuel - rectifications + ventes
+    const realInitialStock = summary.currentStock - summary.totalAdjustments + summary.totalSales;
+    return Math.max(0, realInitialStock);
+  };
+
+  const realInitialStock = calculateRealInitialStock();
+
   // Filtrer par période
   const filteredHistory = history.filter(movement => {
     if (selectedPeriod === 'all') return true;
@@ -127,7 +138,7 @@ export default function StockHistoryModal({ isOpen, onClose, product }: StockHis
           {summary && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-200 dark:border-blue-600">
-                <div className="text-lg font-bold text-blue-600">{summary.initialStock.toFixed(3)}</div>
+                <div className="text-lg font-bold text-blue-600">{realInitialStock.toFixed(3)}</div>
                 <div className="text-xs text-blue-700 dark:text-blue-300">Stock initial</div>
               </div>
               <div className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-red-200 dark:border-red-600">

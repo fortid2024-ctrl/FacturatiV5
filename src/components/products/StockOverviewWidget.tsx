@@ -10,29 +10,20 @@ export default function StockOverviewWidget() {
   // Calculer les statistiques globales
   const totalProducts = products.length;
   const lowStockProducts = products.filter(product => {
-    // Calculer le stock restant : stock initial - quantité vendue + rectifications
-    const summary = getProductStockSummary(product.id);
-    const totalAdjustments = summary ? summary.totalAdjustments : 0;
-    const totalSales = summary ? summary.totalSales : 0;
-    const remainingStock = (product.initialStock || 0) - totalSales + totalAdjustments;
+    // Utiliser le stock actuel calculé par le contexte
+    const remainingStock = calculateCurrentStock(product.id);
     return remainingStock <= (product.minStock || 0);
   }).length;
 
   const outOfStockProducts = products.filter(product => {
-    // Calculer le stock restant : stock initial - quantité vendue + rectifications
-    const summary = getProductStockSummary(product.id);
-    const totalAdjustments = summary ? summary.totalAdjustments : 0;
-    const totalSales = summary ? summary.totalSales : 0;
-    const remainingStock = (product.initialStock || 0) - totalSales + totalAdjustments;
+    // Utiliser le stock actuel calculé par le contexte
+    const remainingStock = calculateCurrentStock(product.id);
     return remainingStock <= 0;
   }).length;
 
   const totalStockValue = products.reduce((sum, product) => {
-    // Calculer le stock restant : stock initial - quantité vendue + rectifications
-    const summary = getProductStockSummary(product.id);
-    const totalAdjustments = summary ? summary.totalAdjustments : 0;
-    const totalSales = summary ? summary.totalSales : 0;
-    const remainingStock = (product.initialStock || 0) - totalSales + totalAdjustments;
+    // Utiliser le stock actuel calculé par le contexte
+    const remainingStock = calculateCurrentStock(product.id);
     return sum + (remainingStock * (product.purchasePrice || 0));
   }, 0);
 

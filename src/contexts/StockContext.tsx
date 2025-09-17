@@ -177,14 +177,18 @@ export function StockProvider({ children }: { children: ReactNode }) {
     const movements = getProductStockHistory(productId);
     if (movements.length === 0) return null;
 
+    // Trouver le mouvement initial ou utiliser le stock du produit
     const initialMovement = movements.find(m => m.type === 'initial');
     const salesMovements = movements.filter(m => m.type === 'sale');
     const adjustmentMovements = movements.filter(m => m.type === 'adjustment');
 
-    const initialStock = initialMovement?.newStock || 0;
+    // Calculer le stock initial réel
+    const currentStock = calculateCurrentStock(productId);
     const totalSales = Math.abs(salesMovements.reduce((sum, m) => sum + m.quantity, 0));
     const totalAdjustments = adjustmentMovements.reduce((sum, m) => sum + m.quantity, 0);
-    const currentStock = calculateCurrentStock(productId);
+    
+    // Stock initial = Stock actuel - rectifications + ventes
+    const initialStock = Math.max(0, currentStock - totalAdjustments + totalSales);
     const lastMovement = movements[0];
 
     return {

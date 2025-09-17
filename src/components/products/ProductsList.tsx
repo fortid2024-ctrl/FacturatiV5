@@ -25,12 +25,14 @@ export default function ProductsList() {
     const product = products.find(p => p.id === productId);
     if (!product) return { remainingStock: 0, ordersCount: 0, totalOrdered: 0 };
 
-    // Calculer le stock restant : stock initial - quantité vendue + rectifications
+    // Utiliser le stock actuel calculé par le contexte Stock
+    const currentStock = calculateCurrentStock(productId);
+    
+    // Calculer les ventes et commandes
     let totalOrdered = 0;
     let ordersCount = 0;
     const ordersSet = new Set();
 
-    // Calculer les ventes
     invoices.forEach(invoice => {
       let hasProduct = false;
       invoice.items.forEach(item => {
@@ -45,13 +47,7 @@ export default function ProductsList() {
     });
 
     ordersCount = ordersSet.size;
-
-    // Calculer les rectifications de stock
-    const summary = getProductStockSummary(productId);
-    const totalAdjustments = summary ? summary.totalAdjustments : 0;
-
-    // Stock restant = stock initial - quantité vendue + rectifications
-    const remainingStock = product.initialStock - totalOrdered + totalAdjustments;
+    const remainingStock = currentStock;
 
     return { remainingStock, ordersCount, totalOrdered };
   };
